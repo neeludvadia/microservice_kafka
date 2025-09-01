@@ -4,6 +4,8 @@ import { CatalogRepository } from "../../repository/catalog.repository";
 import { MockCatalogRepository } from "../../repository/mockCatalog.repository";
 import  {CatelogService}  from "../../services/catalog.service";
 import {faker} from '@faker-js/faker'
+import { ProductFactory } from "../../utils/fixtures";
+
 
 const mockProduct = (rest:any)=>{
   return {
@@ -73,7 +75,7 @@ describe("catalogService", () => {
       test("should update product",async()=>{
         const service = new CatelogService(repository);
         const reqBody = mockProduct({
-          price:+faker.commerce.price(),
+          price:+faker.commerce.price(),   //+ is used to convert string into interger typescript type cast
           id: faker.number.int({min:10,max:1000}),
         });
         const result = await service.updateProduct(reqBody);
@@ -89,8 +91,57 @@ describe("catalogService", () => {
 
       });
 
+    });
 
+
+    describe("getProducts",()=>{
+
+      test("should get products by offset and limit",async()=>{
+        const service = new CatelogService(repository);
+        const randomLimit = faker.number.int({min:10,max:50});
+        const products = ProductFactory.buildList(randomLimit);
+        jest.spyOn(repository,"find").mockImplementationOnce(()=>Promise.resolve(products));
+        const result = await service.getProducts(randomLimit,0);
+        console.log(result);
+        expect(result.length).toEqual(randomLimit);
+        expect(result).toMatchObject(products);
+      });
+
+      test("should throw error with products does not exist",async()=>{
+        const service = new CatelogService(repository);
+
+        jest.spyOn(repository,'find').mockImplementationOnce(()=>Promise.reject(new Error ("products does not exist")))
+
+        await expect(service.getProducts(0,0)).rejects.toThrow("products does not exist")
+
+      });
 
     })
+
+    describe("getProductByid",()=>{
+
+      test("should get product by id",async()=>{
+        const service = new CatelogService(repository);
+        const product = ProductFactory.build();
+        jest.spyOn(repository,"findOne").mockImplementationOnce(()=>Promise.resolve(product));
+        const result = await service.getProduct(product.id!);
+        expect(result).toMatchObject(product);
+      });
+
+    });
+
+    describe("deleteProductByid",()=>{
+
+      test("should delete product by id",async()=>{
+        const service = new CatelogService(repository);
+        const product = ProductFactory.build();
+        jest.spyOn(repository,"delete").mockImplementationOnce(()=>Promise.resolve({id:product?.id}));
+        const result = await service.deleteProducts(product.id!);
+        expect(result).toMatchObject({
+          id:product?.id
+        });
+      });
+
+    });
 
 });

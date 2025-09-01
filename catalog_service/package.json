@@ -14,7 +14,11 @@
   "description": "",
   "dependencies": {
     "@faker-js/faker": "^9.9.0",
+    "@prisma/client": "^6.15.0",
     "@types/express": "^5.0.3",
+    "@types/faker": "^6.6.8",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.2",
     "express": "^5.1.0",
     "typescript": "^5.9.2"
   },
@@ -24,6 +28,7 @@
     "@types/rosie": "^0.0.45",
     "@types/supertest": "^6.0.3",
     "jest": "^30.0.5",
+    "prisma": "^6.15.0",
     "rosie": "^2.1.1",
     "supertest": "^7.1.4",
     "ts-jest": "^29.4.1",

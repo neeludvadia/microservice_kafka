@@ -18,21 +18,30 @@ export class CatelogService {
   }
 
   async updateProduct(input:any){
-    const data = this._repository.update(input);
+    const data = await this._repository.update(input);
+    if(!data.id) {
+      throw new Error("unable to update product")
+    }
     //emit event to update record in Elastic search
     return data;
   }
 
-  getProducts(limit:number,offset:number){
 
+  //instread of this we will get products from elastic search
+  async getProducts(limit:number,offset:number){
+    const products = await this._repository.find(limit,offset)
+    return products;
   }
 
-  getProduct(id:number){
-
+  async getProduct(id:number){
+    const product = await this._repository.findOne(id);
+    return product;
   }
 
-  deleteProducts(id:number){
-
+  async deleteProducts(id:number){
+    const response = await this._repository.delete(id);
+    //delete record from elastic search 
+    return response;
   }
 
 }

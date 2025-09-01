@@ -5,6 +5,9 @@
 		},
 		{
 			"path": "order_service"
+		},
+		{
+			"path": "db"
 		}
 	]
 }
