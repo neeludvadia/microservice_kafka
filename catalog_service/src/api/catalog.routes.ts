@@ -3,12 +3,14 @@ import { CatalogRepository } from '../repository/catalog.repository';
 import { CatelogService } from '../services/catalog.service';
 import { RequestValiator } from '../utils/requestValidator';
 import { CreateProductRequest, UpdateProductRequest } from '../dto/product.dto';
+import { BrokerService } from '../services/broker.service';
 
 
 export const catalog_service = new CatelogService(new CatalogRepository());
 const catalogRouter = express.Router();
 
-
+const brokerService = new BrokerService(catalog_service);
+brokerService.initializeBroker();
 //endpoints
 catalogRouter.post("/products",
   async(req:Request, res:Response, next:NextFunction)=>{
@@ -21,7 +23,8 @@ catalogRouter.post("/products",
         return res.status(201).json(data);
     } catch (error) {
       const err = error as Error;
-      return res.status(500).json(err.message);
+      // return res.status(500).json(err.message);
+      return next(err.message);
     }
   })
 
@@ -50,8 +53,9 @@ catalogRouter.post("/products",
   async(req:Request, res:Response, next:NextFunction)=>{
     const limit = Number(req.query["limit"]);
     const offset = Number(req.query["offset"]);
+    const search = req.query["search"] as string;
     try {
-        const data = await catalog_service?.getProducts(limit,offset);
+        const data = await catalog_service?.getProducts(limit,offset,search);
         return res.status(200).json(data);
     } catch (error) {
       const err = error as Error;
@@ -67,8 +71,9 @@ catalogRouter.post("/products",
         const data = await catalog_service?.getProduct(id);
         return res.status(200).json(data);
     } catch (error) {
-      const err = error as Error;
-      return res.status(500).json(err.message);
+      // const err = error as Error;
+      // return res.status(500).json(err.message);
+      return next(error);
     }
   })
 
@@ -79,6 +84,16 @@ catalogRouter.post("/products",
     try {
         const data = await catalog_service?.deleteProducts(id);
         return res.status(200).json({id:data?.id});
+    } catch (error) {
+      const err = error as Error;
+      return res.status(500).json(err.message);
+    }
+  })
+  
+  catalogRouter?.post("/products/stock",async(req:Request, res:Response,next:NextFunction)=>{
+    try {
+      const data = await catalog_service?.getProductStock(req.body.ids);
+      return res.status(200).json(data);
     } catch (error) {
       const err = error as Error;
       return res.status(500).json(err.message);

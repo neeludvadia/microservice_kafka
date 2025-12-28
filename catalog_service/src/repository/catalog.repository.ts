@@ -1,6 +1,7 @@
 import { PrismaClient } from "../generated/prisma";
 import { IcatalogRepository } from "../interface/catelogRepository.interface";
 import { Product } from "../models/product.model";
+import { NotFoundError } from "../utils";
 
 export class CatalogRepository implements IcatalogRepository {
   _prisma: PrismaClient
@@ -42,8 +43,17 @@ export class CatalogRepository implements IcatalogRepository {
       return Promise.resolve(product)
     }
 
-    throw new Error("product not found");
+    throw new NotFoundError("product not found");
   }
 
+  async findStock(ids:number[]):Promise<Product[]>{
+    return this._prisma.product.findMany({
+      where:{
+        id:{
+          in:ids,
+        }
+      }
+    });
+  }
   
 }

@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "nodemon src/server.ts",
     "start": "node dist/server.js",
+    "migrate":"npx prisma migrate dev --name init",
     "build": "tsc -p .",
     "test": "jest"
   },
@@ -13,13 +14,19 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@elastic/elasticsearch": "^8.19.1",
     "@faker-js/faker": "^9.9.0",
     "@prisma/client": "^6.15.0",
     "@types/express": "^5.0.3",
     "@types/faker": "^6.6.8",
+    "axios": "^1.12.2",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
     "express": "^5.1.0",
+    "kafkajs": "^2.2.4",
+    "pino": "^9.9.5",
+    "pino-http": "^10.5.0",
+    "pino-pretty": "^13.1.1",
     "typescript": "^5.9.2"
   },
   "devDependencies": {
