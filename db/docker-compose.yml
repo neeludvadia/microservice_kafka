@@ -1,10 +1,10 @@
 version: "3"
 
 services:
-  postgres:
+  catalog_db_server:
     image: "postgres:14.0"
     ports:
-      - "5432:5432"
+      - "5433:5432"
     deploy:
       mode: replicated
       replicas: 1
@@ -13,5 +13,35 @@ services:
       POSTGRES_PASSWORD: catalog_db_password
       POSTGRES_DB: catalog_service
     volumes:
-    - ./db-data/postgres/:/var/lib/postgresql/data
+    - ./db-data/catalog_db_service/:/var/lib/postgresql/data
+
+  order_db_server:
+    image: "postgres:14.0"
+    ports:
+      - "5437:5432"  
+      # default port for postgres docker is 5432
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      POSTGRES_USER: order_db
+      POSTGRES_PASSWORD: order_db_password
+      POSTGRES_DB: order_service
+    volumes:
+      - ./db-data/order_db_service/:/var/lib/postgresql/data
+  
+  user_db_server:
+    image: "postgres:14.0"
+    ports:
+      - "5439:5432"  
+      # default port for postgres docker is 5432
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      POSTGRES_USER: user_db
+      POSTGRES_PASSWORD: user_db_password
+      POSTGRES_DB: user_service
+    volumes:
+      - ./db-data/user_db_service/:/var/lib/postgresql/data
   

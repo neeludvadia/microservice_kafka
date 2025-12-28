@@ -1,0 +1,2 @@
+-- ALTER TABLE "cart_line_items" ADD COLUMN "item_name" varchar NOT NULL;--> statement-breakpoint
+-- ALTER TABLE "cart_line_items" DROP COLUMN "items_name";

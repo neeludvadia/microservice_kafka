@@ -2,15 +2,28 @@ import express, { Response,Request, NextFunction } from "express";
 import cors from 'cors';
 import orderRoutes from './routes/order.routes'
 import cartRoutes from './routes/cart.routes'
-const app = express();
-app.use(cors())
-app.use(express.json());
+import { MessageBroker } from "./utils/broker";
+import { Consumer, Producer } from "kafkajs";
+import { httpLogger,HandleErrorWithLogger } from "./utils";
+import { IntializeBroker } from "./service/broker.service";
 
-app.use(orderRoutes);
-app.use(cartRoutes);
+export const ExpressApp = async ()=>{ 
+  const app = express();
+  app.use(cors())
+  app.use(express.json());
+  app.use(httpLogger)
 
-app.use("/",(req:Request, res:Response, _:NextFunction)=>{
-  return res.status(200).json({message:"I am healthy!"});
-});
+  //kafka initalization
+  await IntializeBroker();
 
-export default app;
+  app.use(orderRoutes);
+  app.use(cartRoutes);
+  
+  app.use("/",(req:Request, res:Response, _:NextFunction)=>{
+    return res.status(200).json({message:"I am healthy!"});
+  });
+  
+  
+  app.use(HandleErrorWithLogger);
+  return app;
+};

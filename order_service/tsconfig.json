@@ -112,5 +112,8 @@
   },
   "exclude": [
     "jest.config.ts"
-  ]
+  ],
+  "include": [
+    "src"
+, "../payment_service/src/utils/payment"  ]
 }

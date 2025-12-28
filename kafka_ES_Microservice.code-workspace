@@ -1,13 +1,27 @@
 {
 	"folders": [
 		{
+			"name": "catalog_service",
 			"path": "catalog_service"
 		},
 		{
+			"name": "order_service",
 			"path": "order_service"
 		},
 		{
+			"name": "db",
 			"path": "db"
+		},
+		{
+			"name": "broker",
+			"path": "broker"
+		},
+		{
+			"name": "user_service",
+			"path": "user_service"
+		},
+		{
+			"path": "payment_service"
 		}
 	]
 }
