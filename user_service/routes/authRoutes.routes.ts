@@ -7,13 +7,13 @@ dotenv.config();
 
 const router = express.Router();
 
-const gereateToken = (user:{id:string,email:string}) => {
+const gereateToken = (user: { id: string, email: string }) => {
   return jwt.sign(user, process?.env?.JWT_SECRET as string, {
     // expiresIn: process.env.JWT_EXPIRES_IN,
   });
 };
 
-router.post("/register", async (req:Request, res:Response) => {
+router.post("/register", async (req: Request, res: Response) => {
   const { username, email, password } = req.body;
 
   const userExists = await db.query(`SELECT * FROM "user" WHERE email = $1`, [
@@ -36,7 +36,7 @@ router.post("/register", async (req:Request, res:Response) => {
     .json({ message: "User created", user: newUser.rows[0] });
 });
 
-router.post("/login", async (req:Request, res:Response) => {
+router.post("/login", async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
   const user = await db.query(`SELECT * FROM "user" WHERE email = $1`, [email]);
@@ -58,7 +58,7 @@ router.post("/login", async (req:Request, res:Response) => {
   return res.status(200).json({ message: "Login successful", token });
 });
 
-router.get("/validate", async (req:Request, res:Response) => {
+router.get("/validate", async (req: Request, res: Response) => {
   const token = req.headers["authorization"];
   if (!token) {
     return res.status(401).json({ message: "Unauthorized" });
@@ -67,7 +67,7 @@ router.get("/validate", async (req:Request, res:Response) => {
   try {
     const tokenData = token.split(" ")[1];
     const user = jwt.verify(tokenData, process.env.JWT_SECRET as string);
-    return res.status(200).json({ ...user as jwt.JwtPayload});
+    return res.status(200).json({ ...user as jwt.JwtPayload });
   } catch (error) {
     return res.status(403).json({ message: "Invalid token" });
   }

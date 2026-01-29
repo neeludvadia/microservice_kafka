@@ -7,24 +7,29 @@ import { Consumer, Producer } from "kafkajs";
 import { httpLogger, HandleErrorWithLogger } from "./utils";
 import { IntializeBroker } from "./service/broker.service";
 import rateLimiter from "./service/redisRateLimiter.service";
+import { metricsMiddleware, metricsHandler } from "./utils/metrics";
 
 export const ExpressApp = async () => {
-  const app = express();
-  app.use(cors())
-  app.use(express.json());
-  app.use(httpLogger)
+    const app = express();
+    app.use(cors())
+    app.use(express.json());
+    app.use(httpLogger)
+    app.use(metricsMiddleware);
 
-  //kafka initalization
-  await IntializeBroker();
+    //kafka initalization
+    await IntializeBroker();
 
-  app.use(rateLimiter, orderRoutes);
-  app.use(rateLimiter, cartRoutes);
+    // Metrics endpoint for Prometheus
+    app.get("/metrics", metricsHandler);
 
-  app.use("/", (req: Request, res: Response, _: NextFunction) => {
-    return res.status(200).json({ message: "I am healthy!" });
-  });
+    app.use(rateLimiter, orderRoutes);
+    app.use(rateLimiter, cartRoutes);
+
+    app.use("/", (req: Request, res: Response, _: NextFunction) => {
+        return res.status(200).json({ message: "I am healthy!" });
+    });
 
 
-  app.use(HandleErrorWithLogger);
-  return app;
+    app.use(HandleErrorWithLogger);
+    return app;
 };

@@ -2,6 +2,7 @@ import { Kafka, logLevel, Producer, Consumer, Partitioners } from "kafkajs";
 import { MessageBrokerType, MessageHandler, PublishType } from "./broker.type";
 import { disconnect } from "process";
 import { MessageType, CatalogEvent, TOPIC_TYPE } from "../../types";
+import { kafkaMessagesProducedTotal, kafkaMessagesConsumedTotal } from "../metrics";
 
 //configuration properties
 const CLIENT_ID = process.env.CLIENT_ID || "catalog-service";
@@ -9,28 +10,28 @@ const GROUP_ID = process.env.GROUP_ID || 'catalog-service-group';
 const BROKERS = [process.env._BROKER_1 || "localhost:9092"];
 
 const kafka = new Kafka({
-  clientId:CLIENT_ID,
-  brokers:BROKERS,
+  clientId: CLIENT_ID,
+  brokers: BROKERS,
   logLevel: logLevel.INFO,
 });
 
-let producer:Producer;
+let producer: Producer;
 let consumer: Consumer;
 
-const createTopic = async (topic: string[])=>{
-  const topics = topic.map((t)=>({
+const createTopic = async (topic: string[]) => {
+  const topics = topic.map((t) => ({
     topic: t,
-    numPartitions:2,
+    numPartitions: 2,
     replicationFactor: 1 // based on available brokers
   }));
   const admin = kafka.admin();
   await admin.connect();
   const topicExists = await admin.listTopics();
   console.log("topicExists", topicExists);
-  for(const t of topics){
-    if(!topicExists.includes(t.topic)){
+  for (const t of topics) {
+    if (!topicExists.includes(t.topic)) {
       await admin.createTopics({
-        topics:[t]
+        topics: [t]
       })
     }
   }
@@ -74,6 +75,7 @@ const publish = async (data: PublishType): Promise<boolean> => {
     ],
   });
   console.log("publishing result", result);
+  kafkaMessagesProducedTotal.inc({ topic: data.topic });
   return result.length > 0;
 };
 
@@ -108,6 +110,7 @@ const subscribe = async (
 
   await consumer.run({
     eachMessage: async ({ topic, partition, message }) => {
+      kafkaMessagesConsumedTotal.inc({ topic });
       if (!["CatalogEvents"].includes(topic)) {
         return;
       }

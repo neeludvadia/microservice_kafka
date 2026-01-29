@@ -2,6 +2,7 @@ import { IcatalogRepository } from "../interface/catelogRepository.interface";
 import { OrderWithLineItems } from "../types/message.types";
 import { AppEventListener } from "../utils/AppEventListener";
 import { ElasticSearchService } from "./elasticSearch.service";
+import { productsCreatedTotal, productsUpdatedTotal, productsDeletedTotal, stockUpdatesTotal } from "../utils/metrics";
 
 export class CatelogService {
 
@@ -22,6 +23,7 @@ export class CatelogService {
       event: "createProduct",
       data,
     });
+    productsCreatedTotal.inc();
     return data;
   }
 
@@ -35,6 +37,7 @@ export class CatelogService {
       event: "updateProduct",
       data,
     });
+    productsUpdatedTotal.inc();
     return data;
   }
 
@@ -59,6 +62,7 @@ export class CatelogService {
       event: "deleteProduct",
       data: { id }
     })
+    productsDeletedTotal.inc();
     return response;
   }
 
@@ -85,6 +89,7 @@ export class CatelogService {
         //update stock
         const updateStock = product.stock - item.qty;
         await this.updateProduct({ ...product, stock: updateStock });
+        stockUpdatesTotal.inc();
       }
       //perform stock update operation
     })
