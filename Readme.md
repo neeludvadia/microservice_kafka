@@ -109,6 +109,14 @@ The system uses **Docker** to manage infrastructure components like **Kafka, Ela
 - **Kafka**
   - Message broker for event-driven communication
 
+- **Redis**
+  - Employed for distributed rate limiting across services
+  - Ensures API reliability and abuse prevention
+
+- **Prometheus & Grafana**
+  - **Prometheus**: Scrapes metrics (HTTP, Business, Kafka) from all microservices
+  - **Grafana**: Visualizes metrics via pre-configured dashboards (Orders, Payments, Request Rates, Kafka Throughput)
+
 ---
 
 ## 🐳 Docker Setup
@@ -119,6 +127,9 @@ All infrastructure services are containerized using Docker:
 - Kafka
 - Zookeeper
 - PostgreSQL (4 instances)
+- Redis
+- Prometheus
+- Grafana
 
 This allows easy local development and environment consistency.
 
@@ -145,4 +156,17 @@ docker-compose up -d
 npm install
 
 # Run individual services
+# Run individual services
 npm run dev
+
+## 📊 Observability & Monitoring
+
+Once the services are running, you can access the monitoring tools:
+
+- **Grafana**: [http://localhost:2000](http://localhost:2000) (Credentials: `admin`/`admin`)
+- **Prometheus**: [http://localhost:9090](http://localhost:9090)
+- **Service Metrics**:
+  - Order Service: [http://localhost:9000/metrics](http://localhost:9000/metrics)
+  - Payment Service: [http://localhost:6002/metrics](http://localhost:6002/metrics)
+  - Catalog Service: [http://localhost:8000/metrics](http://localhost:8000/metrics)
+  - User Service: [http://localhost:6000/metrics](http://localhost:6000/metrics)
