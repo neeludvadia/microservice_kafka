@@ -1,4 +1,4 @@
-version: "3"
+# version: "3"
 
 services:
   catalog_db_server:
@@ -44,4 +44,18 @@ services:
       POSTGRES_DB: user_service
     volumes:
       - ./db-data/user_db_service/:/var/lib/postgresql/data
+  
+  # version: "3.8"
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redis-data:/data
+    restart: unless-stopped
+  volumes:
+    redis-data:
+
   

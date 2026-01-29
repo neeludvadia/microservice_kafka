@@ -1,6 +1,6 @@
 // node core module to emit event
-import {EventEmitter} from "events"
-import { ElasticSearchService } from "../services/elasticSearchService";
+import { EventEmitter } from "events"
+import { ElasticSearchService } from "../services/elasticSearch.service";
 
 export interface EventPayload {
   event: "createProduct" | "updateProduct" | "deleteProduct";
@@ -13,24 +13,24 @@ export class AppEventListener extends EventEmitter {
 
   private eventName: string = "ELASTIC_SEARCH_EVENT";
 
-  private constructor(){
+  private constructor() {
     super();
   };
 
   //this is used if the instance is already created just return the instance if not then create a new instance then return it
-  static get instance(){
+  static get instance() {
     return this._instance || (this._instance = new AppEventListener());
   }
 
-    //this is to fire the event through out the application
-    // and only eventpayload interface events are allowed
-  notify(payload: EventPayload){
+  //this is to fire the event through out the application
+  // and only eventpayload interface events are allowed
+  notify(payload: EventPayload) {
     this.emit(this.eventName, payload);
   }
 
   //this is going to help to listen any kind of event throught out the application
-  listen(elasticSerachInstance: ElasticSearchService){
-    this.on(this.eventName,(payload: EventPayload) =>{
+  listen(elasticSerachInstance: ElasticSearchService) {
+    this.on(this.eventName, (payload: EventPayload) => {
       console.log("Event received:", payload);
       elasticSerachInstance.handleEvents(payload);
     });

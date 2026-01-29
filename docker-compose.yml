@@ -42,6 +42,17 @@ services:
     - "9200:9200"
     - "9300:9300"
 
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redis-data/redis-data:/data
+    restart: unless-stopped
+
+
   catalog_db_server:
     image: "postgres:14.0"
     ports:
