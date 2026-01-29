@@ -3,6 +3,7 @@ import { CartRepositoryType } from "../repository/cart.repository";
 import { OrderRepository, OrderRepositoryType } from "../repository/order.repository";
 import { MessageType, OrderStatus } from "../types";
 import { SendCreateOrderMessage } from "./broker.service";
+import { ordersCreatedTotal, orderAmountTotal } from "../utils/metrics";
 
 export const CreateOrder = async (
   userId: number,
@@ -44,6 +45,11 @@ export const CreateOrder = async (
   const order = await repo.createOrder(orderInput);
   await cartRepo.clearCartData(userId);
   console.log("Order created", order);
+
+  // Metrics
+  ordersCreatedTotal.inc({ status: 'created' });
+  orderAmountTotal.inc(Number(cartTotal));
+
   // fire a message to subscription service [catalog service] to update stock
   await SendCreateOrderMessage(orderInput);
 
@@ -98,23 +104,23 @@ export const HandleSubscription = async (message: MessageType) => {
 };
 
 
-export const CheckoutOrder = async(
-  orderNumber:number,
-  repo:OrderRepositoryType
-)=>{
+export const CheckoutOrder = async (
+  orderNumber: number,
+  repo: OrderRepositoryType
+) => {
   const order = await repo.findOrderByOrderNumber(orderNumber);
-  if(!order){
+  if (!order) {
     throw new Error("Order not found");
   }
 
-  const checkoutOrder:InProcessOrder = {
-    id:order.id,
-    orderNumber:order.orderNumber,
-    status:order.status,
-    customerId:order.customerId,
-    amount:Number(order.amount),
-    createdAt:order.createdAt,
-    updatedAt:order.updatedAt
+  const checkoutOrder: InProcessOrder = {
+    id: order.id,
+    orderNumber: order.orderNumber,
+    status: order.status,
+    customerId: order.customerId,
+    amount: Number(order.amount),
+    createdAt: order.createdAt,
+    updatedAt: order.updatedAt
   }
 
   return checkoutOrder;
